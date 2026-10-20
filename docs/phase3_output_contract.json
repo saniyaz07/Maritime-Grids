@@ -1,0 +1,82 @@
+{
+  "schema": {
+    "predicted_weather": "str -- one of: Calm, Moderate, Stormy",
+    "predicted_fuel_consumption": "float -- Liters (L) per voyage (Evidence Level B \u2014 Strongly Inferred; original raw source lacks explicit unit annotation)",
+    "predicted_CO2": "float -- kg CO2 (derived: predicted_fuel_consumption x emission_factor[fuel_type], where Diesel=2.750 kg/L, HFO=2.754 kg/L)",
+    "predicted_SOC_end_of_voyage": "float -- degradation-adjusted fraction [0.0, 1.0] (effective_ah = pack_capacity_ah * predicted_SOH)",
+    "predicted_SOH": "float -- fraction [0.0, 1.0]"
+  },
+  "model_sources": {
+    "predicted_weather": "models/weather_final.joblib (majority-class baseline, accuracy 34.72%)",
+    "predicted_fuel_consumption": "models/fuel_xgb.joblib (XGBoost, RMSE=1092.22, R2=0.9513) -- outputs Liters (L) per voyage (Evidence Level B)",
+    "predicted_CO2": "derived: predicted_fuel_consumption x emission_factor[fuel_type] (Diesel=2.749960, HFO=2.753806)",
+    "predicted_SOC_end_of_voyage": "Degradation-adjusted Coulomb counting: initial_soc - q_discharged / (pack_capacity_ah * predicted_SOH), clamped to [0.0, 1.0], using corrected pack topology from data/reference/ship_profiles.csv",
+    "predicted_SOH": "models/battery_soh_final.joblib (HistGradientBoostingRegressor, B0007 RMSE=0.0397, R2=0.6308) -- CORRECTED Stage 2D: replaced invalid soh_24_model"
+  },
+  "pack_config": {
+    "note": "Corrected Stage 2D -- all profiles now mutually consistent",
+    "cell_nominal_v": 3.6,
+    "cell_nominal_ah": 2.0,
+    "series": 96,
+    "profiles": {
+      "Oil Service Boat": {
+        "battery_cell_config": "96S940P",
+        "nominal_voltage_v": 345.6,
+        "pack_capacity_ah": 1880.0,
+        "battery_pack_capacity_kwh": 649.728
+      },
+      "Fishing Trawler": {
+        "battery_cell_config": "96S362P",
+        "nominal_voltage_v": 345.6,
+        "pack_capacity_ah": 724.0,
+        "battery_pack_capacity_kwh": 250.2144
+      },
+      "Surfer Boat": {
+        "battery_cell_config": "96S217P",
+        "nominal_voltage_v": 345.6,
+        "pack_capacity_ah": 434.0,
+        "battery_pack_capacity_kwh": 149.9904
+      },
+      "Tanker Ship": {
+        "battery_cell_config": "96S1736P",
+        "nominal_voltage_v": 345.6,
+        "pack_capacity_ah": 3472.0,
+        "battery_pack_capacity_kwh": 1199.9232
+      }
+    }
+  },
+  "example_prediction": {
+    "predicted_weather": "Calm",
+    "predicted_fuel_consumption": 3120.5,
+    "predicted_CO2": 8580.2,
+    "predicted_SOC_end_of_voyage": 0.5881,
+    "predicted_SOH": 0.7387
+  },
+  "notes": "Phase 3 Output Contract (Frozen 2026-09-27): (1) Fuel unit is classified as Liters (L) per voyage, Evidence Level B \u2014 Strongly Inferred, supported by empirical CO2/fuel ratio (~2.750 kg CO2/L for Marine Diesel, ~2.754 kg CO2/L for HFO), IMO volumetric diesel combustion chemistry, and engine load plausibility. This is an engineering inference, not an explicitly sourced unit. (2) OPEX fuel calculation uses fuel_consumption_L * fuel_price_per_litre_USD_per_L. (3) Operational CII is calculated directly from CO2 mass as (predicted_CO2_kg * 1000) / (dwt_tonnes * distance_nm). (4) Battery end-of-voyage SOC calculations apply predicted SOH to available capacity (effective_ah = pack_capacity_ah * predicted_SOH), so battery degradation directly affects reported end-of-voyage SOC. (5) predicted_SOH is also exported separately for long-term health and lifecycle tracking.",
+  "stage2d_corrections": {
+    "soh_model_wiring": "FIXED",
+    "pack_topology": "FIXED -- all 4 ship types",
+    "data_raw_modified": false,
+    "soh_aware_soc_integration": "IMPLEMENTED (effective_ah = pack_capacity_ah * predicted_soh)",
+    "fuel_unit_classification": "Evidence Level B \u2014 Strongly Inferred as Liters (L) per voyage"
+  },
+  "phase3_derivatives_contract": {
+    "opex_fuel": {
+      "formula": "predicted_fuel_consumption_L * fuel_price_per_litre_USD_per_L",
+      "units": "USD ($)",
+      "status": "READY (operationally usable; underlying volumetric unit is Evidence Level B engineering inference)",
+      "caveat": "The inferred volumetric unit matches the USD/L price denominator in ship_profiles.csv, but fuel unit remains an engineering inference."
+    },
+    "cii_operational": {
+      "formula": "(predicted_CO2_kg * 1000) / (dwt_tonnes * distance_nm)",
+      "units": "g CO2 / (dwt * nm)",
+      "inputs": {
+        "predicted_CO2_kg": "kg CO2 (converted to grams by x1000 in formula)",
+        "dwt_tonnes": "metric tonnes (from ship_profiles.csv dwt_tonnes)",
+        "distance_nm": "nautical miles (from voyage distance)"
+      },
+      "status": "READY (calculated directly from CO2 mass; raw fuel-volume ambiguity does not enter final CII formula once predicted_CO2 is available)",
+      "governing_standard": "IMO Resolution MEPC.352(78)"
+    }
+  }
+}

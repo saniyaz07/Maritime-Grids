@@ -1,0 +1,747 @@
+{
+  "battery": {
+    "nominal_capacity_ah": 2.0,
+    "total_discharge_cycles": 2769,
+    "soh_mean": 0.6633,
+    "soh_std": 0.2363,
+    "soh_min": 0.0,
+    "soh_max": 1.3201,
+    "soh_gt1": 11,
+    "soh_lt0": 0,
+    "soc_lstm": {
+      "rmse": 0.0734,
+      "mae": 0.0549,
+      "n_train_seqs": 3866,
+      "n_test_seqs": 967,
+      "batteries_used": [
+        "B0005",
+        "B0006",
+        "B0007",
+        "B0018"
+      ],
+      "temperature_condition": 24
+    },
+    "soh_degradation": {
+      "4": {
+        "n_cells": 16,
+        "n_cycles": 1006,
+        "slope_soh_per_cycle": 0.001683,
+        "intercept": 0.3871,
+        "rmse": 0.2322
+      },
+      "22": {
+        "n_cells": 3,
+        "n_cycles": 123,
+        "slope_soh_per_cycle": -0.000389,
+        "intercept": 0.7838,
+        "rmse": 0.1287
+      },
+      "24": {
+        "n_cells": 14,
+        "n_cycles": 1375,
+        "slope_soh_per_cycle": -0.00096,
+        "intercept": 0.8484,
+        "rmse": 0.1182
+      },
+      "43": {
+        "n_cells": 4,
+        "n_cycles": 160,
+        "slope_soh_per_cycle": -0.002311,
+        "intercept": 0.908,
+        "rmse": 0.0224
+      },
+      "44": {
+        "n_cells": 3,
+        "n_cycles": 105,
+        "slope_soh_per_cycle": -0.003918,
+        "intercept": 0.9232,
+        "rmse": 0.084
+      }
+    },
+    "pack_extrapolation": {
+      "status": "CORRECTED \u2014 Stage 2D: pack topology reconciled, soh_24_model replaced",
+      "pack_config": {
+        "series": 96,
+        "parallel": 1736,
+        "cell_nominal_ah": 2.0,
+        "cell_nominal_v": 3.6,
+        "assumed_source": "ship_profiles.csv (Tanker) \u2014 corrected Stage 2D"
+      },
+      "pack_voltage_v": 345.6,
+      "pack_capacity_ah": 3472.0,
+      "pack_energy_kwh_cell_estimate": 1199.9232,
+      "example_cycle_n": 150,
+      "example_predicted_soh": 0.7387,
+      "example_pack_energy_remaining_kwh": 886.4,
+      "example_voyage_soc_end": 0.5881,
+      "soc_formulation": "SOH-aware degradation-adjusted (effective_ah = nominal_ah * predicted_soh)"
+    },
+    "pack_topology_reconciliation": {
+      "status": "CORRECTED \u2014 Stage 2D 2026-09-27",
+      "cell_nominal_v": 3.6,
+      "cell_nominal_ah": 2.0,
+      "correction_note": "All four ship profiles corrected: S=96 kept, V=345.6V (96x3.6), P solved from kWh design target / (345.6 x 2.0). Old configs had inconsistent nominal_voltage_v and parallel count.",
+      "corrected_profiles": {
+        "Oil Service Boat": {
+          "battery_cell_config": "96S940P",
+          "nominal_voltage_v": 345.6,
+          "pack_capacity_ah": 1880.0,
+          "battery_pack_capacity_kwh": 649.728
+        },
+        "Fishing Trawler": {
+          "battery_cell_config": "96S362P",
+          "nominal_voltage_v": 345.6,
+          "pack_capacity_ah": 724.0,
+          "battery_pack_capacity_kwh": 250.2144
+        },
+        "Surfer Boat": {
+          "battery_cell_config": "96S217P",
+          "nominal_voltage_v": 345.6,
+          "pack_capacity_ah": 434.0,
+          "battery_pack_capacity_kwh": 149.9904
+        },
+        "Tanker Ship": {
+          "battery_cell_config": "96S1736P",
+          "nominal_voltage_v": 345.6,
+          "pack_capacity_ah": 3472.0,
+          "battery_pack_capacity_kwh": 1199.9232
+        }
+      }
+    },
+    "soh_model_wiring": {
+      "status": "CORRECTED \u2014 Stage 2D 2026-09-27",
+      "old_model": "soh_24_model (pooled LinearRegression) \u2014 declared invalid in Stage 2C SOH audit",
+      "new_model": "models/battery_soh_final.joblib (HistGradientBoostingRegressor, cell-holdout split)",
+      "new_model_val_rmse": 0.0392,
+      "new_model_test_rmse": 0.0397,
+      "new_model_test_r2": 0.6308
+    },
+    "pack_soc_voyage_traces": {
+      "status": "CORRECTED Stage 2D -- physically realistic battery-hybrid scenarios",
+      "root_cause_previous_failure": "Initial examples used 5-15% main engine power for 4h sea passages, demanding 560-1920 kWh from packs of 112-485 kWh usable capacity. Battery is a peak-shaving/port-maneuvering system, not a propulsion replacement. No clip() was masking the issue -- the voyage parameters were unrealistic.",
+      "traces": {
+        "Oil Service Boat": {
+          "scenario": "Port maneuvering 1h + hotel 3h",
+          "pack_kwh": 649.728,
+          "soh_pred": 0.7471,
+          "usable_kwh": 485.41,
+          "demand_kwh": 180.0,
+          "start_soc": 0.9,
+          "end_soc": 0.5292,
+          "status": "PLAUSIBLE"
+        },
+        "Fishing Trawler": {
+          "scenario": "Hotel-only transit 4h",
+          "pack_kwh": 250.2144,
+          "soh_pred": 0.7442,
+          "usable_kwh": 186.21,
+          "demand_kwh": 80.0,
+          "start_soc": 0.85,
+          "end_soc": 0.4204,
+          "status": "PLAUSIBLE"
+        },
+        "Surfer Boat": {
+          "scenario": "6-min sprint + hotel 1h",
+          "pack_kwh": 149.9904,
+          "soh_pred": 0.7488,
+          "usable_kwh": 112.32,
+          "demand_kwh": 37.0,
+          "start_soc": 0.8,
+          "end_soc": 0.4706,
+          "status": "PLAUSIBLE"
+        },
+        "Tanker Ship": {
+          "scenario": "Zero-emission port maneuvering 2h + hotel 2h",
+          "pack_kwh": 1199.9232,
+          "soh_pred": 0.7387,
+          "usable_kwh": 886.38,
+          "demand_kwh": 632.0,
+          "start_soc": 0.9,
+          "end_soc": 0.187,
+          "status": "PLAUSIBLE"
+        },
+        "Tanker Ship (Historical 200A)": {
+          "scenario": "Historical comparison: 200A for 4h (800 Ah / 276.48 kWh)",
+          "pack_kwh": 1199.9232,
+          "soh_pred": 0.7387,
+          "usable_kwh": 886.38,
+          "demand_kwh": 276.48,
+          "start_soc": 0.9,
+          "end_soc": 0.5881,
+          "status": "PLAUSIBLE"
+        }
+      }
+    }
+  },
+  "weather_classifier": {
+    "ceiling": 0.4251,
+    "ceiling_median": 0.4305,
+    "ceiling_min": 0.3415,
+    "ceiling_max": 0.56,
+    "n_groups": 48,
+    "majority_baseline_accuracy": 0.3472,
+    "ship_holdout": {
+      "accuracy": 0.309,
+      "macro_f1": 0.2884,
+      "weighted_f1": 0.2912
+    },
+    "route_holdout": {
+      "Escravos-Lagos": {
+        "accuracy": 0.3577,
+        "macro_f1": 0.2391
+      },
+      "Lagos-Apapa": {
+        "accuracy": 0.268,
+        "macro_f1": 0.2466
+      },
+      "Port Harcourt-Lagos": {
+        "accuracy": 0.3059,
+        "macro_f1": 0.287
+      },
+      "Warri-Bonny": {
+        "accuracy": 0.3265,
+        "macro_f1": 0.213
+      }
+    }
+  },
+  "co2_diagnostic": {
+    "Diesel": {
+      "count": 899,
+      "mean": 2.74996,
+      "median": 2.749596,
+      "std": 0.146211,
+      "cv": 0.053168,
+      "min": 2.501581,
+      "max": 2.999984
+    },
+    "HFO": {
+      "count": 541,
+      "mean": 2.753806,
+      "median": 2.759206,
+      "std": 0.146132,
+      "cv": 0.053065,
+      "min": 2.500098,
+      "max": 2.99935
+    }
+  },
+  "emission_factors": {
+    "Diesel": 2.749960207668532,
+    "HFO": 2.7538059377650304
+  },
+  "split": {
+    "train_ships": 96,
+    "test_ships": 24,
+    "train_rows": 1152,
+    "test_rows": 288
+  },
+  "fuel_model": {
+    "linear_regression": {
+      "ship_holdout": {
+        "rmse": 1221.06,
+        "mae": 876.12,
+        "r2": 0.9391
+      },
+      "route_holdout": {
+        "Escravos-Lagos": {
+          "rmse": 1144.83,
+          "mae": 812.26,
+          "r2": 0.9489
+        },
+        "Lagos-Apapa": {
+          "rmse": 1212.81,
+          "mae": 878.69,
+          "r2": 0.9437
+        },
+        "Port Harcourt-Lagos": {
+          "rmse": 1187.88,
+          "mae": 851.71,
+          "r2": 0.9405
+        },
+        "Warri-Bonny": {
+          "rmse": 1131.96,
+          "mae": 818.62,
+          "r2": 0.9316
+        }
+      }
+    },
+    "xgboost": {
+      "ship_holdout": {
+        "rmse": 1173.44,
+        "mae": 662.27,
+        "r2": 0.9438
+      },
+      "route_holdout": {
+        "Escravos-Lagos": {
+          "rmse": 1211.54,
+          "mae": 660.87,
+          "r2": 0.9428
+        },
+        "Lagos-Apapa": {
+          "rmse": 1240.1,
+          "mae": 709.8,
+          "r2": 0.9411
+        },
+        "Port Harcourt-Lagos": {
+          "rmse": 1109.16,
+          "mae": 626.41,
+          "r2": 0.9481
+        },
+        "Warri-Bonny": {
+          "rmse": 1031.6,
+          "mae": 599.5,
+          "r2": 0.9432
+        }
+      }
+    },
+    "co2_derived": {
+      "rmse": 3584.21,
+      "mae": 1995.01,
+      "r2": 0.9324
+    }
+  },
+  "environment": {
+    "random_seed": 42,
+    "python_version": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "xgboost_version": "3.4.1",
+    "torch_version": "2.14.0+cpu",
+    "device": "cpu",
+    "master_table_path": "C:/maritime grids/data/processed/master_training_table.csv",
+    "master_table_rows": 1440
+  },
+  "final_validation": {
+    "Phase 1 master table loaded": true,
+    "Required columns exist": true,
+    "Battery SOH corrected (2.0 Ah)": true,
+    "No artificial SOH clipping": true,
+    "Weather ceiling calculated": true,
+    "CO2 diagnostic calculated": true,
+    "Ship IDs disjoint (no leakage)": true,
+    "Route holdout implemented": true,
+    "Model A trained": true,
+    "Model B linear trained": true,
+    "Model B XGBoost trained": true,
+    "Model C LSTM saved": true,
+    "Model C SOH regression saved": true,
+    "Metrics JSON saved": true,
+    "Phase 3 contract saved": true,
+    "Figures directory populated": true
+  },
+  "stage_2a_weather": {
+    "training_class_distribution": {
+      "Calm": 416,
+      "Moderate": 366,
+      "Stormy": 370
+    },
+    "training_class_percentages": {
+      "Calm": 36.11,
+      "Moderate": 31.77,
+      "Stormy": 32.12
+    },
+    "majority_baseline": {
+      "predicted_class": "Calm",
+      "accuracy": 0.3472,
+      "macro_f1": 0.1718,
+      "weighted_f1": 0.179
+    },
+    "logistic_regression": {
+      "accuracy": 0.3333,
+      "macro_f1": 0.3304,
+      "weighted_f1": 0.3311,
+      "route_holdouts": {
+        "Escravos-Lagos": {
+          "accuracy": 0.3577,
+          "macro_f1": 0.1756,
+          "weighted_f1": 0.1885
+        },
+        "Lagos-Apapa": {
+          "accuracy": 0.3247,
+          "macro_f1": 0.1634,
+          "weighted_f1": 0.1592
+        },
+        "Port Harcourt-Lagos": {
+          "accuracy": 0.3008,
+          "macro_f1": 0.1542,
+          "weighted_f1": 0.1391
+        },
+        "Warri-Bonny": {
+          "accuracy": 0.3571,
+          "macro_f1": 0.2497,
+          "weighted_f1": 0.2576
+        }
+      }
+    },
+    "previous_xgboost": {
+      "accuracy": 0.309,
+      "macro_f1": 0.2884,
+      "weighted_f1": 0.2912
+    },
+    "tuned_xgboost": {
+      "best_hyperparameters": {
+        "max_depth": 4,
+        "n_estimators": 100,
+        "learning_rate": 0.2
+      },
+      "cv_mean_macro_f1": 0.3276,
+      "cv_std_macro_f1": 0.0111,
+      "scoring_metric": "macro-F1",
+      "primary_ship_holdout": {
+        "accuracy": 0.3194,
+        "macro_f1": 0.3072,
+        "weighted_f1": 0.3101
+      },
+      "route_holdouts": {
+        "Escravos-Lagos": {
+          "accuracy": 0.3686,
+          "macro_f1": 0.2882,
+          "weighted_f1": 0.2956
+        },
+        "Lagos-Apapa": {
+          "accuracy": 0.3067,
+          "macro_f1": 0.2085,
+          "weighted_f1": 0.2006
+        },
+        "Port Harcourt-Lagos": {
+          "accuracy": 0.3188,
+          "macro_f1": 0.3079,
+          "weighted_f1": 0.302
+        },
+        "Warri-Bonny": {
+          "accuracy": 0.3435,
+          "macro_f1": 0.2727,
+          "weighted_f1": 0.2747
+        }
+      }
+    },
+    "production_model_selected": "Majority Baseline (Calm)",
+    "beats_majority_baseline": false,
+    "matches_majority_baseline": true,
+    "improves_over_previous_xgb": true
+  },
+  "stage_2b_fuel": {
+    "dataset_audit": {
+      "total_rows": 1440,
+      "total_columns": 50,
+      "unique_ships": 120,
+      "unique_routes": 4,
+      "null_counts": {
+        "ship_type": 0,
+        "route_id": 0,
+        "fuel_type": 0,
+        "weather_conditions": 0,
+        "distance": 0,
+        "engine_efficiency": 0,
+        "displacement": 0,
+        "engine_power": 0,
+        "DWT": 0,
+        "fuel_consumption": 0,
+        "CO2_emissions": 0
+      },
+      "target_summary": {
+        "mean": 4844.25,
+        "median": 3060.88,
+        "std": 4892.35,
+        "min": 237.88,
+        "q25": 1837.96,
+        "q75": 4870.68,
+        "max": 24648.52
+      }
+    },
+    "primary_split": {
+      "train_ships": 96,
+      "test_ships": 24,
+      "train_rows": 1152,
+      "test_rows": 288,
+      "ship_intersection": 0
+    },
+    "linear_regression_baseline": {
+      "primary_ship_holdout": {
+        "rmse": 1221.57,
+        "mae": 876.97,
+        "r2": 0.939
+      },
+      "route_holdouts": {
+        "Escravos-Lagos": {
+          "train_rows": 1071,
+          "test_rows": 369,
+          "rmse": 1147.1,
+          "mae": 817.73,
+          "r2": 0.9487
+        },
+        "Lagos-Apapa": {
+          "train_rows": 1052,
+          "test_rows": 388,
+          "rmse": 1206.96,
+          "mae": 869.48,
+          "r2": 0.9442
+        },
+        "Port Harcourt-Lagos": {
+          "train_rows": 1051,
+          "test_rows": 389,
+          "rmse": 1187.3,
+          "mae": 851.82,
+          "r2": 0.9405
+        },
+        "Warri-Bonny": {
+          "train_rows": 1146,
+          "test_rows": 294,
+          "rmse": 1132.87,
+          "mae": 818.73,
+          "r2": 0.9315
+        }
+      }
+    },
+    "xgboost": {
+      "best_hyperparameters": {
+        "max_depth": 3,
+        "n_estimators": 100,
+        "learning_rate": 0.05
+      },
+      "cv_folds": 5,
+      "cv_grouping_variable": "ship_id",
+      "cv_mean_rmse": 999.72,
+      "cv_std_rmse": 194.75,
+      "cv_mean_mae": 604.84,
+      "cv_mean_r2": 0.9564,
+      "scoring_metric": "RMSE",
+      "primary_ship_holdout": {
+        "rmse": 1092.22,
+        "mae": 662.09,
+        "r2": 0.9513
+      },
+      "route_holdouts": {
+        "Escravos-Lagos": {
+          "train_rows": 1071,
+          "test_rows": 369,
+          "rmse": 1033.1,
+          "mae": 620.45,
+          "r2": 0.9584
+        },
+        "Lagos-Apapa": {
+          "train_rows": 1052,
+          "test_rows": 388,
+          "rmse": 1055.76,
+          "mae": 653.12,
+          "r2": 0.9573
+        },
+        "Port Harcourt-Lagos": {
+          "train_rows": 1051,
+          "test_rows": 389,
+          "rmse": 1011.8,
+          "mae": 618.92,
+          "r2": 0.9568
+        },
+        "Warri-Bonny": {
+          "train_rows": 1146,
+          "test_rows": 294,
+          "rmse": 940.77,
+          "mae": 570.66,
+          "r2": 0.9528
+        }
+      }
+    },
+    "deterministic_co2": {
+      "empirical_factors": {
+        "Diesel": 2.74996,
+        "HFO": 2.753806
+      },
+      "formula": "predicted_CO2 = predicted_fuel_consumption * empirical_factor[fuel_type]",
+      "units": "kg CO2 / fuel unit",
+      "unit_notes": "Derived from observed ratio; corresponds to kg CO2 emitted per Litre of fuel burned.",
+      "primary_test_performance": {
+        "rmse": 3310.0,
+        "mae": 1969.37,
+        "r2": 0.9423
+      },
+      "no_separate_ml_model_statement": "CO2 was not trained as a separate ML target because the existing diagnostic showed a sufficiently stable deterministic relationship between fuel consumption and CO2 emissions (CV < 5.4% for both Diesel and HFO)."
+    },
+    "model_comparison": {
+      "lower_rmse_model": "XGBoost",
+      "lower_mae_model": "XGBoost",
+      "higher_r2_model": "XGBoost",
+      "production_fuel_model": "models/fuel_xgb.joblib"
+    },
+    "reproducibility": {
+      "random_seed": 42,
+      "python_version": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "xgboost_version": "3.4.1",
+      "sklearn_version": "1.9.0",
+      "pandas_version": "3.0.5",
+      "numpy_version": "2.5.1",
+      "device": "cpu",
+      "gpu_used": false,
+      "input_path": "C:/maritime grids/data/processed/master_training_table.csv",
+      "models_saved": [
+        "C:/maritime grids/models/fuel_linear.joblib",
+        "C:/maritime grids/models/fuel_xgb.joblib"
+      ],
+      "figures_saved": [
+        "C:/maritime grids/docs/figures/fuel_actual_vs_predicted.png",
+        "C:/maritime grids/docs/figures/fuel_feature_importance.png"
+      ]
+    }
+  },
+  "stage_2c_soc_split": {
+    "target_definition": "Nominal-reference SOC = clip(1.0 - Q_discharged / 2.0 Ah, 0.0, 1.0)",
+    "target_notes": "Nominal reference relative to fixed 2.0 Ah fresh rating; does not adjust denominator for capacity fade.",
+    "missing_cells": {
+      "B0018": "132 discharge records in metadata, 0 CSV measurement files on disk; excluded from time-series sequences."
+    },
+    "eligible_cells": {
+      "B0005": {
+        "discharge_records": 168,
+        "csv_present": 168,
+        "sequences": 1761
+      },
+      "B0006": {
+        "discharge_records": 168,
+        "csv_present": 168,
+        "sequences": 1761
+      },
+      "B0007": {
+        "discharge_records": 168,
+        "csv_present": 126,
+        "sequences": 1311
+      }
+    },
+    "splits": {
+      "train": {
+        "cells": [
+          "B0005",
+          "B0006"
+        ],
+        "cycles": 268,
+        "sequences": 2798
+      },
+      "validation": {
+        "cells": [
+          "B0005",
+          "B0006"
+        ],
+        "cycles": 68,
+        "sequences": 724
+      },
+      "test": {
+        "cells": [
+          "B0007"
+        ],
+        "cycles": 126,
+        "sequences": 1311
+      }
+    },
+    "leakage_checks": {
+      "train_test_cell_overlap_zero": true,
+      "train_test_cycle_overlap_zero": true,
+      "val_test_cell_overlap_zero": true,
+      "val_test_cycle_overlap_zero": true,
+      "train_val_cycle_overlap_zero": true,
+      "no_sequence_crosses_cycle_boundary": true,
+      "scaler_fit_strictly_on_train": true
+    }
+  },
+  "stage_2c_soc": {
+    "model_type": "LSTM (Baseline, 2 layers, 64 hidden, dropout 0.2)",
+    "target_definition": "Nominal-reference SOC = clip(1.0 - Q_discharged / 2.0 Ah, 0.0, 1.0)",
+    "training_configuration": {
+      "loss": "MSELoss",
+      "optimizer": "Adam",
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "max_epochs": 20,
+      "patience": 5,
+      "random_seed": 42,
+      "device": "cpu"
+    },
+    "training_run": {
+      "best_epoch": 11,
+      "best_val_loss": 0.007549,
+      "epochs_completed": 16
+    },
+    "metrics": {
+      "train": {
+        "rmse": 0.0788,
+        "mae": 0.0617,
+        "r2": 0.8728
+      },
+      "validation": {
+        "rmse": 0.0868,
+        "mae": 0.0727,
+        "r2": 0.7703
+      },
+      "test_b0007_unseen": {
+        "rmse": 0.0678,
+        "mae": 0.0539,
+        "r2": 0.9089
+      }
+    },
+    "prediction_ranges": {
+      "train": {
+        "pred_min": 0.0334,
+        "pred_max": 0.8874,
+        "actual_min": 0.0884,
+        "actual_max": 0.8743
+      },
+      "val": {
+        "pred_min": 0.2263,
+        "pred_max": 0.8334,
+        "actual_min": 0.3136,
+        "actual_max": 0.8743
+      },
+      "test": {
+        "pred_min": 0.0922,
+        "pred_max": 0.8894,
+        "actual_min": 0.098,
+        "actual_max": 0.8756
+      }
+    },
+    "soc_bin_error_analysis": {
+      "0.0-0.2": {
+        "sample_count": 111,
+        "mae": 0.0988,
+        "rmse": 0.1091,
+        "mean_residual": -0.0971
+      },
+      "0.2-0.4": {
+        "sample_count": 347,
+        "mae": 0.056,
+        "rmse": 0.0693,
+        "mean_residual": -0.0323
+      },
+      "0.4-0.6": {
+        "sample_count": 316,
+        "mae": 0.0644,
+        "rmse": 0.0768,
+        "mean_residual": 0.0136
+      },
+      "0.6-0.8": {
+        "sample_count": 347,
+        "mae": 0.043,
+        "rmse": 0.0525,
+        "mean_residual": -0.0091
+      },
+      "0.8-1.0": {
+        "sample_count": 190,
+        "mae": 0.0264,
+        "rmse": 0.0336,
+        "mean_residual": 0.0228
+      }
+    },
+    "audit_compliance": {
+      "b0007_used_in_training": false,
+      "b0007_used_in_validation": false,
+      "scaler_fitted_on_test": false,
+      "scaler_fitted_on_val": false,
+      "b0007_used_strictly_for_final_eval": true
+    },
+    "artifacts_generated": {
+      "model": "C:/maritime grids/models/battery_soc_lstm.pt",
+      "candidate_model": "C:/maritime grids/models/battery_soc_lstm_candidate.pt",
+      "per_cycle_metrics": "C:/maritime grids/data/processed/battery/soc_test_cycle_metrics.csv",
+      "figures": [
+        "C:/maritime grids/docs/figures/battery_soc_actual_vs_predicted.png",
+        "C:/maritime grids/docs/figures/battery_soc_residuals.png",
+        "C:/maritime grids/docs/figures/battery_soc_test_timeline.png",
+        "C:/maritime grids/docs/figures/battery_soc_training_curve.png"
+      ]
+    }
+  }
+}

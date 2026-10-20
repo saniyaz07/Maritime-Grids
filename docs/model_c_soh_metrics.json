@@ -1,0 +1,362 @@
+{
+  "stage_2c_soh": {
+    "dataset": {
+      "total_records": 2769,
+      "excluded_zero_capacity": 3,
+      "excluded_B0041_calibration": 42,
+      "excluded_missing_waveform": 537,
+      "excluded_total": 582,
+      "eligible_total": 2187,
+      "train_cells": [
+        "B0005",
+        "B0025",
+        "B0026",
+        "B0027",
+        "B0028",
+        "B0029",
+        "B0030",
+        "B0031",
+        "B0032",
+        "B0033",
+        "B0034",
+        "B0036",
+        "B0038",
+        "B0039",
+        "B0040",
+        "B0041",
+        "B0042",
+        "B0043",
+        "B0044",
+        "B0045",
+        "B0046",
+        "B0047",
+        "B0048",
+        "B0049",
+        "B0050",
+        "B0051",
+        "B0052"
+      ],
+      "val_cells": [
+        "B0006"
+      ],
+      "test_cells": [
+        "B0007"
+      ],
+      "train_n": 1893,
+      "val_n": 168,
+      "test_n": 126
+    },
+    "baseline": {
+      "val": {
+        "label": "baseline_val",
+        "n": 168,
+        "RMSE": 0.161249,
+        "MAE": 0.123236,
+        "R2": -0.647085,
+        "mean_resid": -0.10107,
+        "median_resid": -0.07033,
+        "pred_min": 0.672356,
+        "pred_max": 0.672356,
+        "n_pred_lt_0": 0,
+        "n_pred_gt_1": 0
+      },
+      "test": {
+        "label": "baseline_test",
+        "n": 126,
+        "RMSE": 0.193818,
+        "MAE": 0.182496,
+        "R2": -7.816506,
+        "mean_resid": -0.182496,
+        "median_resid": -0.18214,
+        "pred_min": 0.672356,
+        "pred_max": 0.672356,
+        "n_pred_lt_0": 0,
+        "n_pred_gt_1": 0
+      }
+    },
+    "models": {
+      "linear": {
+        "name": "LinearRegression",
+        "train": {
+          "label": "linear_train",
+          "n": 1893,
+          "RMSE": 0.141455,
+          "MAE": 0.103459,
+          "R2": 0.670966,
+          "mean_resid": -0.0,
+          "median_resid": -0.033649,
+          "pred_min": -0.024371,
+          "pred_max": 1.211228,
+          "n_pred_lt_0": 2,
+          "n_pred_gt_1": 82
+        },
+        "val": {
+          "label": "linear_val",
+          "n": 168,
+          "RMSE": 0.126682,
+          "MAE": 0.098913,
+          "R2": -0.016607,
+          "mean_resid": -0.073191,
+          "median_resid": -0.049577,
+          "pred_min": 0.664381,
+          "pred_max": 0.769124,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        },
+        "test": {
+          "label": "linear_test",
+          "n": 126,
+          "RMSE": 0.165458,
+          "MAE": 0.158103,
+          "R2": -5.42515,
+          "mean_resid": -0.158103,
+          "median_resid": -0.153714,
+          "pred_min": 0.659988,
+          "pred_max": 0.753081,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        }
+      },
+      "ridge": {
+        "name": "Ridge(alpha=1.0)",
+        "train": {
+          "label": "ridge_train",
+          "n": 1893,
+          "RMSE": 0.141517,
+          "MAE": 0.103436,
+          "R2": 0.670677,
+          "mean_resid": -0.0,
+          "median_resid": -0.033396,
+          "pred_min": 0.023579,
+          "pred_max": 1.211734,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 82
+        },
+        "val": {
+          "label": "ridge_val",
+          "n": 168,
+          "RMSE": 0.126377,
+          "MAE": 0.098813,
+          "R2": -0.011711,
+          "mean_resid": -0.072658,
+          "median_resid": -0.049286,
+          "pred_min": 0.667586,
+          "pred_max": 0.768566,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        },
+        "test": {
+          "label": "ridge_test",
+          "n": 126,
+          "RMSE": 0.166283,
+          "MAE": 0.158988,
+          "R2": -5.489357,
+          "mean_resid": -0.158988,
+          "median_resid": -0.1547,
+          "pred_min": 0.660174,
+          "pred_max": 0.752013,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        }
+      },
+      "rf": {
+        "name": "RandomForestRegressor(n_est=200, depth=8)",
+        "train": {
+          "label": "rf_train",
+          "n": 1893,
+          "RMSE": 0.017423,
+          "MAE": 0.009704,
+          "R2": 0.995008,
+          "mean_resid": 7.5e-05,
+          "median_resid": -9.9e-05,
+          "pred_min": 0.003404,
+          "pred_max": 1.110661,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 3
+        },
+        "val": {
+          "label": "rf_val",
+          "n": 168,
+          "RMSE": 0.039646,
+          "MAE": 0.032209,
+          "R2": 0.90043,
+          "mean_resid": 0.017532,
+          "median_resid": 0.019978,
+          "pred_min": 0.631838,
+          "pred_max": 0.981634,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        },
+        "test": {
+          "label": "rf_test",
+          "n": 126,
+          "RMSE": 0.040146,
+          "MAE": 0.035041,
+          "R2": 0.621738,
+          "mean_resid": 0.018302,
+          "median_resid": 0.026186,
+          "pred_min": 0.793377,
+          "pred_max": 0.979122,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        }
+      },
+      "hgb": {
+        "name": "HistGradientBoosting(iter=200, lr=0.05)",
+        "train": {
+          "label": "hgb_train",
+          "n": 1893,
+          "RMSE": 0.022248,
+          "MAE": 0.01041,
+          "R2": 0.991861,
+          "mean_resid": -3e-06,
+          "median_resid": 0.000191,
+          "pred_min": -0.053259,
+          "pred_max": 0.998934,
+          "n_pred_lt_0": 5,
+          "n_pred_gt_1": 0
+        },
+        "val": {
+          "label": "hgb_val",
+          "n": 168,
+          "RMSE": 0.039177,
+          "MAE": 0.034376,
+          "R2": 0.902775,
+          "mean_resid": 0.013249,
+          "median_resid": 0.02241,
+          "pred_min": 0.608271,
+          "pred_max": 0.938313,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        },
+        "test": {
+          "label": "hgb_test",
+          "n": 126,
+          "RMSE": 0.03966,
+          "MAE": 0.033488,
+          "R2": 0.630845,
+          "mean_resid": 0.025199,
+          "median_resid": 0.023835,
+          "pred_min": 0.81169,
+          "pred_max": 0.968938,
+          "n_pred_lt_0": 0,
+          "n_pred_gt_1": 0
+        }
+      }
+    },
+    "selected_model": "hgb",
+    "selected_model_name": "HistGradientBoosting(iter=200, lr=0.05)",
+    "final_test_B0007": {
+      "label": "final_test_B0007",
+      "n": 126,
+      "RMSE": 0.03966,
+      "MAE": 0.033488,
+      "R2": 0.630845,
+      "mean_resid": 0.025199,
+      "median_resid": 0.023835,
+      "pred_min": 0.81169,
+      "pred_max": 0.968938,
+      "n_pred_lt_0": 0,
+      "n_pred_gt_1": 0
+    },
+    "final_test_B0007_by_cycle_range": [
+      {
+        "label": "1-40",
+        "n": 40,
+        "RMSE": 0.022489,
+        "MAE": 0.019174,
+        "R2": -4.413018,
+        "mean_resid": -0.006853,
+        "median_resid": -0.011938,
+        "pred_min": 0.895522,
+        "pred_max": 0.968938,
+        "n_pred_lt_0": 0,
+        "n_pred_gt_1": 0
+      },
+      {
+        "label": "41-80",
+        "n": 40,
+        "RMSE": 0.023398,
+        "MAE": 0.020246,
+        "R2": 0.426496,
+        "mean_resid": 0.020161,
+        "median_resid": 0.021139,
+        "pred_min": 0.852886,
+        "pred_max": 0.948177,
+        "n_pred_lt_0": 0,
+        "n_pred_gt_1": 0
+      },
+      {
+        "label": "81-126",
+        "n": 46,
+        "RMSE": 0.058245,
+        "MAE": 0.057451,
+        "R2": -7.193716,
+        "mean_resid": 0.057451,
+        "median_resid": 0.060664,
+        "pred_min": 0.81169,
+        "pred_max": 0.86546,
+        "n_pred_lt_0": 0,
+        "n_pred_gt_1": 0
+      }
+    ],
+    "residual_analysis": {
+      "mean": 0.025199,
+      "median": 0.023835,
+      "std": 0.030625,
+      "corr_with_actual": -0.905506,
+      "by_soh_range": [
+        {
+          "range": "0.6-0.8",
+          "n": 37,
+          "mean": 0.0612,
+          "median": 0.0615,
+          "std": 0.0052
+        },
+        {
+          "range": "0.8-1.0",
+          "n": 89,
+          "mean": 0.0102,
+          "median": 0.0153,
+          "std": 0.0235
+        }
+      ]
+    },
+    "feature_importances": {
+      "linear": {
+        "V_end": 0.32907928554043253,
+        "V_drop": 0.36219396492500433,
+        "V_mean": -0.028139839577906042,
+        "V_min": 0.030469260161408662,
+        "duration": 0.11351677993211232,
+        "ambient_temperature": 0.16152583110477212,
+        "cycle_number": 0.008764411877416632
+      },
+      "ridge": {
+        "V_end": 0.271035677002217,
+        "V_drop": 0.3043401700038528,
+        "V_mean": -0.02751864795023874,
+        "V_min": 0.03011472731505998,
+        "duration": 0.11373904819658812,
+        "ambient_temperature": 0.16210405252362237,
+        "cycle_number": 0.009085505606142437
+      },
+      "rf": {
+        "V_end": 0.014470369816172479,
+        "V_drop": 0.18231793839031976,
+        "V_mean": 0.007698009593820188,
+        "V_min": 0.03946293646358061,
+        "duration": 0.5821980177093772,
+        "ambient_temperature": 0.15163016207763536,
+        "cycle_number": 0.022222565949094438
+      }
+    },
+    "B0041_exclusion": {
+      "criterion": "Capacity_numeric < 0.5 Ah",
+      "cycle_range": "1-42",
+      "n_excluded": 42,
+      "max_cap_excluded": 0.0569,
+      "min_cap_retained": 0.8365
+    }
+  }
+}

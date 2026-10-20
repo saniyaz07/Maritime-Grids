@@ -1,0 +1,58 @@
+{
+  "target_definition": "Nominal-reference SOC = clip(1.0 - Q_discharged / 2.0 Ah, 0.0, 1.0)",
+  "target_notes": "Nominal reference relative to fixed 2.0 Ah fresh rating; does not adjust denominator for capacity fade.",
+  "missing_cells": {
+    "B0018": "132 discharge records in metadata, 0 CSV measurement files on disk; excluded from time-series sequences."
+  },
+  "eligible_cells": {
+    "B0005": {
+      "discharge_records": 168,
+      "csv_present": 168,
+      "sequences": 1761
+    },
+    "B0006": {
+      "discharge_records": 168,
+      "csv_present": 168,
+      "sequences": 1761
+    },
+    "B0007": {
+      "discharge_records": 168,
+      "csv_present": 126,
+      "sequences": 1311
+    }
+  },
+  "splits": {
+    "train": {
+      "cells": [
+        "B0005",
+        "B0006"
+      ],
+      "cycles": 268,
+      "sequences": 2798
+    },
+    "validation": {
+      "cells": [
+        "B0005",
+        "B0006"
+      ],
+      "cycles": 68,
+      "sequences": 724
+    },
+    "test": {
+      "cells": [
+        "B0007"
+      ],
+      "cycles": 126,
+      "sequences": 1311
+    }
+  },
+  "leakage_checks": {
+    "train_test_cell_overlap_zero": true,
+    "train_test_cycle_overlap_zero": true,
+    "val_test_cell_overlap_zero": true,
+    "val_test_cycle_overlap_zero": true,
+    "train_val_cycle_overlap_zero": true,
+    "no_sequence_crosses_cycle_boundary": true,
+    "scaler_fit_strictly_on_train": true
+  }
+}

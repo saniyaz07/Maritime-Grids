@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maritime Clean-Energy Platform — Operator Dashboard</title>
+  <link rel="stylesheet" href="styles.css?v=table_v2">
+  <script>
+    // Ensure trailing slash so relative paths resolve to /dashboard/*
+    if (window.location.pathname === '/dashboard') {
+      window.location.replace('/dashboard/' + window.location.search + window.location.hash);
+    }
+    // Immediate global error reporter
+    window.addEventListener('error', function(e) {
+      console.error('Script Error:', e);
+      var c = document.getElementById('view-driver-dashboard');
+      if (c && !c.hasChildNodes()) {
+        c.innerHTML = '<div style="padding:20px;margin:20px;background:#1e1b4b;border:1px solid #ef4444;color:#fca5a5;font-family:monospace;border-radius:8px;">' +
+          '<strong>Script Error:</strong> ' + e.message + '<br><small>' + (e.filename || '') + ':' + (e.lineno || '') + '</small></div>';
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Fixed Top Header -->
+    <header class="app-header">
+      <div class="app-branding">
+        <span class="app-logo">⚓</span>
+        <div class="app-title-group">
+          <h1>Maritime Clean-Energy Platform</h1>
+          <span class="app-subtitle">Operator Decision Support &amp; Fleet Intelligence</span>
+        </div>
+        <div class="header-role-badge">
+          <span class="role-dot"></span>
+          <span class="role-text">CHIEF OPERATOR</span>
+        </div>
+      </div>
+
+      <!-- Header Controls: UTC Clock & Dashboard Tab -->
+      <div class="header-right-group">
+        <div class="utc-clock-display" id="header-utc-clock">
+          <span class="clock-label">UTC TIME</span>
+          <span class="clock-time" id="header-utc-time">--:--:-- UTC</span>
+        </div>
+
+        <nav class="nav-tabs">
+          <button id="nav-tab-driver" class="nav-tab-btn active">
+            🧭 Driver / Operator Dashboard
+          </button>
+          <button id="nav-tab-engineering" class="nav-tab-btn">
+            ⚙️ Engineering Workbench
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <div id="view-driver-dashboard" class="dashboard-view-container">
+        <!-- Rendered by DriverDashboard.js -->
+      </div>
+      <div id="view-engineering-dashboard" class="dashboard-view-container" style="display: none;">
+        <!-- Rendered by EngineeringDashboard.js -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Immediate UTC clock tick so clock is never stuck at --:--:--
+    (function tickClock() {
+      var el = document.getElementById("header-utc-time");
+      if (el) {
+        var now = new Date();
+        var h = String(now.getUTCHours()).padStart(2, "0");
+        var m = String(now.getUTCMinutes()).padStart(2, "0");
+        var s = String(now.getUTCSeconds()).padStart(2, "0");
+        el.textContent = h + ":" + m + ":" + s + " UTC";
+      }
+      setTimeout(tickClock, 1000);
+    })();
+  </script>
+  <script type="module" src="app.js?v=table_v2"></script>
+</body>
+</html>
