@@ -21,6 +21,19 @@ import numpy as np
 import pandas as pd
 import joblib
 
+# Cross-version compatibility shim for unpickling BitGenerators (numpy 1.x <-> 2.x)
+try:
+    import numpy.random._pickle as _npp
+    _orig_bit_gen_ctor = _npp.__bit_generator_ctor
+    def _safe_bit_gen_ctor(bit_generator='MT19937'):
+        if isinstance(bit_generator, type):
+            return bit_generator()
+        return _orig_bit_gen_ctor(bit_generator)
+    _npp.__bit_generator_ctor = _safe_bit_gen_ctor
+except Exception:
+    pass
+
+
 from phase3_contracts import (
     VoyageMetadata,
     Tier1Phase2Predictions,
