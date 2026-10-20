@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: maritime-grids
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run_product.py
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
