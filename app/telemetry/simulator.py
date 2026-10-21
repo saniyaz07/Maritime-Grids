@@ -144,6 +144,12 @@ class SimulatorControlRequest(BaseModel):
     current_speed_knots: Optional[float] = Field(default=None, ge=0.0, le=15.0, description="Ocean current speed override")
     current_direction_deg: Optional[float] = Field(default=None, ge=0.0, le=360.0, description="Ocean current direction override")
     environmental_mode: Optional[str] = Field(default=None, description="Environmental mode: AUTOMATIC_FORECAST, MANUAL_SCENARIO")
+    latitude: Optional[float] = Field(default=None, ge=-90.0, le=90.0, description="Vessel current latitude")
+    longitude: Optional[float] = Field(default=None, ge=-180.0, le=180.0, description="Vessel current longitude")
+    route_id: Optional[str] = Field(default=None, description="Active transit route identifier")
+    origin_port: Optional[str] = Field(default=None, description="Voyage departure terminal")
+    destination_port: Optional[str] = Field(default=None, description="Voyage destination port")
+    total_distance_nm: Optional[float] = Field(default=None, ge=0.0, description="Total corridor distance (NM)")
 
 
 # =====================================================================
@@ -388,6 +394,24 @@ class VirtualVesselSimulator:
                 self.state.ocean_conditions.current_speed_knots = max(0.0, req.current_speed_knots)
             if req.current_direction_deg is not None:
                 self.state.ocean_conditions.current_direction_deg = round(req.current_direction_deg % 360.0, 1)
+
+            if req.latitude is not None:
+                self.state.latitude = req.latitude
+            if req.longitude is not None:
+                self.state.longitude = req.longitude
+            if req.route_id is not None:
+                self.state.route_id = req.route_id
+            if req.origin_port is not None:
+                self.state.origin_port = req.origin_port
+            if req.destination_port is not None:
+                self.state.destination_port = req.destination_port
+            if req.total_distance_nm is not None:
+                self.state.total_distance_nm = req.total_distance_nm
+                self.state.distance_remaining_nm = req.total_distance_nm
+                self.state.distance_travelled_nm = 0.0
+                self.state.route_progress_pct = 0.0
+                if req.latitude is not None and req.longitude is not None:
+                    self.state.travelled_track = [[req.latitude, req.longitude]]
 
             self.state.timestamp_utc = datetime.now(timezone.utc).isoformat()
             self._recalculate_physics()

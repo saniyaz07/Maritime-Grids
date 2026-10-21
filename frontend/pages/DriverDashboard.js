@@ -34,7 +34,7 @@ import { renderFuelCard, renderBatteryCard } from "../components/EnergyCard.js";
 import { renderSolarCard } from "../components/SolarCard.js";
 import { renderWeatherCard } from "../components/WeatherCard.js";
 import { renderVoyageStatusCard } from "../components/VoyageStatusCard.js";
-import { renderRouteMapCard } from "../components/RouteMapCard.js";
+import { renderRouteMapCard, MARITIME_ROUTES_CATALOG } from "../components/RouteMapCard.js";
 import { renderAdvisoryPanel } from "../components/AdvisoryPanel.js";
 import { renderTelemetryStatusBadge } from "../components/TelemetryStatusBadge.js";
 import { renderEngineeringWorkbench } from "../components/EngineeringWorkbench.js?v=table_v2";
@@ -56,6 +56,7 @@ export class DriverDashboardPage {
     this.travelledTrack = []; // History of coordinates for track polyline
     this.lastLookaheadQuery = { lat: null, lon: null, sog: null, timestamp: 0 };
     this.virtualSimState = null;
+    this.activeRouteId = "ESC_LOS_01";
     this.mapLayersState = { corridor: true, track: true, vector: true };
     this.state = {
       loading: true,
@@ -526,6 +527,56 @@ export class DriverDashboardPage {
     }
   }
 
+  async selectMaritimeRoute(routeId) {
+    if (!MARITIME_ROUTES_CATALOG[routeId]) return;
+    this.activeRouteId = routeId;
+    const rObj = MARITIME_ROUTES_CATALOG[routeId];
+    const departureWp = rObj.waypoints[0];
+    const nextWp = rObj.waypoints[1] || rObj.waypoints[0];
+
+    // Compute initial bearing towards next waypoint
+    const lat1 = departureWp.latitude * Math.PI / 180;
+    const lat2 = nextWp.latitude * Math.PI / 180;
+    const dLon = (nextWp.longitude - departureWp.longitude) * Math.PI / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    let initialHdg = Math.round((Math.atan2(y, x) * 180 / Math.PI + 360) % 360);
+
+    this.travelledTrack = [[departureWp.latitude, departureWp.longitude]];
+
+    if (this.virtualSimState) {
+      this.virtualSimState.route_id = rObj.name;
+      this.virtualSimState.origin_port = rObj.origin || departureWp.name;
+      this.virtualSimState.destination_port = rObj.destination || rObj.waypoints[rObj.waypoints.length - 1].name;
+      this.virtualSimState.latitude = departureWp.latitude;
+      this.virtualSimState.longitude = departureWp.longitude;
+      this.virtualSimState.heading_deg = initialHdg;
+      this.virtualSimState.course_over_ground_deg = initialHdg;
+      this.virtualSimState.total_distance_nm = rObj.distance_nm;
+      this.virtualSimState.distance_remaining_nm = rObj.distance_nm;
+      this.virtualSimState.distance_travelled_nm = 0.0;
+      this.virtualSimState.route_progress_pct = 0.0;
+      this.virtualSimState.travelled_track = [[departureWp.latitude, departureWp.longitude]];
+    }
+
+    try {
+      await this.handleSimAction("control", {
+        latitude: departureWp.latitude,
+        longitude: departureWp.longitude,
+        heading_deg: initialHdg,
+        route_id: rObj.name,
+        origin_port: rObj.origin || departureWp.name,
+        destination_port: rObj.destination || rObj.waypoints[rObj.waypoints.length - 1].name,
+        total_distance_nm: rObj.distance_nm,
+      });
+      await this.apiClient.refreshSimulatorWeather();
+    } catch (err) {
+      console.warn("Simulator backend route sync notice:", err);
+    }
+
+    this.render();
+  }
+
   render() {
     if (!this.container && typeof document !== "undefined") {
       this.container = document.getElementById("view-driver-dashboard");
@@ -653,8 +704,10 @@ export class DriverDashboardPage {
       lookahead: this.state.lookahead,
     } : null;
 
+    const activeRouteObj = MARITIME_ROUTES_CATALOG[this.activeRouteId] || MARITIME_ROUTES_CATALOG["ESC_LOS_01"];
+    const routeTotalDist = activeRouteObj?.distance_nm ?? 250.0;
     const timelineContext = {
-      remaining_distance_nm: isSimMode ? (sim.distance_remaining_nm ?? 250.0) : (progress?.distance_remaining_nm ?? 250.0),
+      remaining_distance_nm: isSimMode ? (sim.distance_remaining_nm ?? routeTotalDist) : (progress?.distance_remaining_nm ?? routeTotalDist),
       progress_pct: isSimMode ? (sim.route_progress_pct ?? 0.0) : (progress?.route_progress_pct ?? 0.0),
       estimated_arrival_utc: isSimMode ? (sim.eta_utc ?? "Calculated dynamically") : (progress?.eta_utc ?? "Calculated dynamically"),
     };
@@ -784,8 +837,9 @@ export class DriverDashboardPage {
             route,
             lookahead: this.state.lookahead,
             recentHistory: this.recentHistory,
-            travelledTrack: isSimMode ? (this.travelledTrack.length > 0 ? this.travelledTrack : (sim.travelled_track || [[5.58, 5.18]])) : [],
+            travelledTrack: isSimMode ? (this.travelledTrack.length > 0 ? this.travelledTrack : (sim.travelled_track || [[currentLat, currentLon]])) : [],
             timeline: timelineContext,
+            activeRouteId: this.activeRouteId || "ESC_LOS_01",
           })}
         </div>
 
@@ -917,6 +971,13 @@ export class DriverDashboardPage {
       }
     });
     this.container.querySelector("#scenario-select")?.addEventListener("change", (e) => this.selectScenario(e.target.value));
+
+    // Active Route Selection Dropdown (10 West African Corridors)
+    const routeSelect = this.container.querySelector("#select-active-route");
+    routeSelect?.addEventListener("change", async (e) => {
+      const newRouteId = e.target.value;
+      await this.selectMaritimeRoute(newRouteId);
+    });
 
     // Simulator transport buttons
     this.container.querySelector("#btn-sim-start")?.addEventListener("click", () => this.handleSimAction("start"));
